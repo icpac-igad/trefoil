@@ -6,15 +6,13 @@ Conversions are loosely based on OCGIS approach to CRS:
 https://github.com/NCPP/ocgis/blob/master/src/ocgis/interface/base/crs.py
 """
 
-
 import logging
 import os
 import re
-from pyproj import Proj, pj_list, pj_ellps, pyproj_datadir
+from pyproj import Proj, pj_list, pj_ellps, datadir
 
 from trefoil.netcdf.utilities import get_ncattrs, set_ncattrs
 from rasterio.crs import CRS
-
 
 PROJ4_GEOGRAPHIC = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs'
 
@@ -26,12 +24,13 @@ def invert_dict(dictionary):
 
 
 def epsg_to_proj4(epsg_code):
-    data = open(os.path.join(pyproj_datadir, 'epsg')).read()
+    data = open(os.path.join(datadir.get_data_dir(), 'epsg')).read()
     match = re.search('(?<=<{0}>).*(?=<>)'.format(epsg_code), data)
     if not match:
         raise ValueError('ERROR: EPSG {0} not found in proj4 data file'.format(epsg_code))
 
-    return match.group().strip().replace('longlat', 'latlong')  # pyproj stores the longlat instead of latlong as used here
+    return match.group().strip().replace('longlat',
+                                         'latlong')  # pyproj stores the longlat instead of latlong as used here
 
 
 PROJ4_KEY = 'proj4'
@@ -250,7 +249,6 @@ def set_crs(dataset, variable_name, projection, set_proj4_att=False):
     variable.setncattr('grid_mapping', crs_variable_name)
 
 
-
 def is_geographic(dataset, variable_name):
     """
     Try to determine if dataset appears to be geographic.  This is a fallback if a true CRS cannot be obtained using other
@@ -275,5 +273,3 @@ def is_geographic(dataset, variable_name):
             return True
 
     return False
-
-
