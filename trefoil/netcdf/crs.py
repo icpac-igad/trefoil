@@ -262,7 +262,8 @@ def is_geographic(dataset, variable_name):
     options = (
         {'lat', 'lon'},
         {'lat', 'long'},
-        {'latitude', 'longitude'}
+        {'latitude', 'longitude'},
+        {'x','y'}
     )
 
     variable = dataset.variables[variable_name]
